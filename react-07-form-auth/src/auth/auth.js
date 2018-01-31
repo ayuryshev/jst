@@ -2,10 +2,11 @@ import React from 'react'
 import {
     withRouter,
     Redirect,
-    Route
+    Route,
+    Link
  } from 'react-router-dom'
 
- const fakeAuth = {
+ const auth = {
     isAuthenticated: false,
     authenticate(cb) {
       this.isAuthenticated = true
@@ -18,15 +19,15 @@ import {
   }
   
 
-export const AuthButton = withRouter(({ history }) => (
-  fakeAuth.isAuthenticated ? (
+export const AuthStatus = withRouter(({ history }) => (
+  auth.isAuthenticated ? (
     <p>
       Welcome! <button onClick={() => {
-        fakeAuth.signout(() => history.push('/'))
+        auth.signout(() => history.push('/'))
       }}>Sign out</button>
     </p>
   ) : (
-    <p>You are not logged in.</p>
+    <p>You are not logged in. <Link to="/login">Login</Link> </p>
   )
 ))
 
@@ -36,7 +37,7 @@ export class Login extends React.Component {
     }
   
     login = () => {
-      fakeAuth.authenticate(() => {
+      auth.authenticate(() => {
         this.setState({ redirectToReferrer: true })
       })
     }
@@ -62,7 +63,7 @@ export class Login extends React.Component {
   
 export const PrivateRoute = ({ component: Component, ...rest }) => (
     <Route {...rest} render={props => (
-      fakeAuth.isAuthenticated ? (
+      auth.isAuthenticated ? (
         <Component {...props}/>
       ) : (
         <Redirect to={{

@@ -1,24 +1,25 @@
 import React, { Component } from 'react'
+import {createStore, combineReducers} from 'redux'
+import {reducer as formReducer} from 'redux-form'
+import {Provider} from 'react-redux'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import logo from './static/logo.svg'
 import './static/App.css'
+import { Login, PrivateRoute, AuthStatus } from './auth/auth'
+import { SFLogin, SFPrivateRoute, SFAuthStatus } from './auth/sfAuth'
 
-import {
-  BrowserRouter as Router,
-  Route,
-  Link
-} from 'react-router-dom'
+const rootReducer = combineReducers({
+  form: formReducer
+})
 
-import {
-  Login,
-  PrivateRoute,
-  AuthButton
-} from './auth/auth'
+const store = createStore(rootReducer)
 
 const AppHeader = () => (
   <header className="App-header">
   <img src={logo} className="App-logo" alt="logo" />
   <h1 className="App-title">Welcome to React</h1>
-  <AuthButton />
+  <AuthStatus />
+  <SFAuthStatus />
   </header>
 )
 
@@ -30,6 +31,7 @@ const AppIntro = () => (
         <li><Link to="/mui">MuiDemo</Link></li>
         <li><Link to="/grid">GridDemo</Link></li>
         <li><Link to="/protected">Protected</Link></li>
+        <li><Link to="/sf-protected">SFProtected</Link></li>
       </ul>
     </div>                    
   </div> 
@@ -38,23 +40,27 @@ const AppIntro = () => (
 const Routes = () => (
   <div>
     <Route path="/login" component={Login}/>
+    <Route path="/sf-login" component={SFLogin}/>
     <Route exact="true" path="/" component={Home}/>
     <Route path="/mui" component={MuiDemo}/>
     <PrivateRoute path="/grid" component={GridDemo}/>
     <PrivateRoute path="/protected" component={HOC("Protected")}/>
+    <SFPrivateRoute path="/sf-protected" component={HOC("SFProtected")}/>
   </div>
 )
 
 class App extends Component {
   render() {
-    return (    
-      <Router>        
-      <div className="App">
-        <AppHeader />
-        <AppIntro />
-        <Routes />
-      </div>          
-    </Router>
+    return (
+      <Provider store={store}>
+        <Router>        
+        <div className="App">
+          <AppHeader />
+          <AppIntro />
+          <Routes />
+        </div>          
+      </Router>
+    </Provider>
     )
   }
 }
