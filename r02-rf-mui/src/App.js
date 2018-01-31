@@ -37,7 +37,12 @@ class App extends Component {
     return (
       <Provider store={store}>
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-            <NotSoSimpleForm onSubmit={showResults} />
+            <div align="center">
+              <p>
+              <h1> Redux Form with MUI </h1>
+              </p>
+              <NotSoSimpleForm onSubmit={showResults} />
+            </div>
         </MuiThemeProvider>
       </Provider>
     );
