@@ -5,6 +5,8 @@ import { withRouter, Redirect, Route, Link } from 'react-router-dom'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+// TODO: trigger rerendering after successful `submit`
+
 // Auth state is local, so it's OK
 const auth = {
   isAuthenticated: false,
@@ -38,15 +40,13 @@ export class SFLogin extends React.Component {
     state = {
       redirectToReferrer: false
     }
-  
+
     login = () => {
       auth.authenticate(() => {
         this.setState({ redirectToReferrer: true })
       })
     }
   
-    
-
     render() {
       const { from } = this.props.location.state || { from: { pathname: '/' } }
       const { redirectToReferrer } = this.state
@@ -82,39 +82,42 @@ export const SFPrivateRoute = ({ component: Component, ...rest }) => (
 // SubmitValidationForm.js
 
 
-const renderField = ({ input, label, type, meta: { touched, error } }) => (
-    <div>
-      <label>{label}</label>
-      <div>
-        <input {...input} placeholder={label} type={type} />
-        {touched && error && <span>{error}</span>}
-      </div>
-    </div>
-  )
 
-
-function submit(values) {
-    return sleep(1000).then(() => {
-      // simulate server latency
-      if (!['john', 'paul', 'george', 'ringo'].includes(values.username)) {
-        throw new SubmissionError({
-          username: 'User does not exist',
-          _error: 'Login failed!'
-        })
-      } else if (values.password !== 'redux-form') {
-        throw new SubmissionError({
-          password: 'Wrong password',
-          _error: 'Login failed!'
-        })
-      }else{
-        auth.authenticate(()=>{})
-      }
-    })
+const submit = (values) => {
+  return sleep(1000).then(() => {
+    // simulate server latency
+    if (!['john', 'paul', 'george', 'ringo'].includes(values.username)) {
+      throw new SubmissionError({
+        username: 'User does not exist',
+        _error: 'Login failed!'
+      })
+    } else if (values.password !== 'redux-form') {
+      throw new SubmissionError({
+        password: 'Wrong password',
+        _error: 'Login failed!'
+      })
+    }else{
+      auth.isAuthenticated = true      
+    }
+  })
 }
+
+
+const renderField = ({ input, label, type, meta: { touched, error } }) => (
+  <div>
+    <label>{label}</label>
+    <div>
+      <input {...input} placeholder={label} type={type} />
+      {touched && error && <span>{error}</span>}
+    </div>
+  </div>
+)
 
 const SubmitValidationForm = props => {
     const { error, handleSubmit, pristine, reset, submitting } = props
+
     return (
+      // <form onSubmit={handleSubmit(SFLogin.submit)}>
       <form onSubmit={handleSubmit(submit)}>
         <Field
           name="username"
